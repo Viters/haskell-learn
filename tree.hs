@@ -1,13 +1,16 @@
 import System.IO
 
-class MyShow a where
-    myShow :: MyShow a => a -> String
+class Convert to where
+    convert :: Tree a -> to
 
 data Tree a = Empty | Node (Tree a) a (Tree a) deriving (Eq, Ord, Show)
+data STree a = SEmpty | SLeaf a | SBranch (STree a) a (STree a) deriving (Show)
 
-instance Show a => MyShow (Tree a) where
-    myShow Empty = ""
-    myShow (Node l v r) = (myShow l) ++ (show v) ++ (myShow r) 
+instance Eq a => Convert (STree a) where
+    convertToSTree Empty = SEmpty
+    convertToSTree node@(Node l v r)
+        |   isLeaf node = (SLeaf v)
+        |   otherwise = (SBranch (convertToSTree l) v (convertToSTree r))
 
 empty :: Tree a -> Bool
 empty Empty = True
@@ -82,6 +85,7 @@ tests = [
     (tMap (* 2) testTree == Node (Node Empty 10 Empty) 14 (Node Empty 22 Empty), "testTree mapped with (* 2) should be (Node (Node Empty 10 Empty) 14 (Node Empty 22 Empty))"),
     (leaves testTree == [5,11], "testTree should have 2 leaves: 5 and 11"),
     (leaves nonBalancedTestTree == [3], "nonBalancedTestTree should have 1 leaf: 3"),
+    (convertToSTree testTree == SBranch (SLeaf 5) 7 (SLeaf 11), "testTree converted ")
     (isBST testTree == True, "testTree should be BST")
     ]
 
