@@ -1,6 +1,13 @@
 import System.IO
 
+class MyShow a where
+    myShow :: MyShow a => a -> String
+
 data Tree a = Empty | Node (Tree a) a (Tree a) deriving (Eq, Ord, Show)
+
+instance Show a => MyShow (Tree a) where
+    myShow Empty = ""
+    myShow (Node l v r) = (myShow l) ++ (show v) ++ (myShow r) 
 
 empty :: Tree a -> Bool
 empty Empty = True
