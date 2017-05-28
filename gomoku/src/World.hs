@@ -2,13 +2,15 @@ module World where
 
 import Board
 
-data CurrentPlayer = P1 | P2 deriving (Eq, Show)
-data World = World Board CurrentPlayer deriving Show
+data World = World { _board :: Board, _currentPlayer :: Player } deriving Show
 
 braveNewWorld :: World
-braveNewWorld = World emptyBoard P1
+braveNewWorld = World emptyBoard X
 
-passTurn :: World -> World
-passTurn (World a p) = case p of
-                            P1 -> (World a P2)
-                            P2 -> (World a P1)
+nextPlayer :: Player -> Player
+nextPlayer a = case a of 
+                    X -> O
+                    O -> X
+
+registerMove :: World -> Position -> World
+registerMove (World board cp) pos = World (putOnBoard board pos cp) (nextPlayer cp)

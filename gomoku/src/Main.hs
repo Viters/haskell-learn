@@ -3,4 +3,7 @@ module Main where
 import World
 
 main :: IO ()
-main = putStrLn "Hello"
+main = do
+    world <- braveNewWorld
+    -- let world = makeMove world (1, 0)
+

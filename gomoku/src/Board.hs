@@ -5,11 +5,11 @@ import Control.Lens
 
 type Position = (Int, Int)
 
-data Field = O | X deriving (Eq, Show)
-data Row = Row { _columns :: [Maybe Field] }
+data Player = O | X deriving (Eq, Show)
+data Row = Row { _columns :: [Maybe Player] }
 data Board = Board { _rows :: [Row] }
 
-showPosition :: Maybe Field -> String
+showPosition :: Maybe Player -> String
 showPosition a = case a of
                     Nothing -> "-"
                     Just a -> show a
@@ -26,8 +26,8 @@ emptyRow = Row (replicate 19 Nothing)
 emptyBoard :: Board
 emptyBoard = Board (replicate 19 $ emptyRow)
 
-setInRow :: Row -> Int -> Field -> Row
-setInRow (Row fields) y f = Row $ (element y .~ Just f) fields
+putInRow :: Row -> Int -> Player -> Row
+putInRow (Row fields) y f = Row $ (element y .~ Just f) fields
 
-putOnBoard :: Board -> Position -> Field -> Board
-putOnBoard (Board rows) (x, y) f = Board $ (element x .~ setInRow (rows !! x) y f) rows
+putOnBoard :: Board -> Position -> Player -> Board
+putOnBoard (Board rows) (x, y) f = Board $ (element x .~ putInRow (rows !! x) y f) rows
