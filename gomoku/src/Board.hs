@@ -2,6 +2,7 @@ module Board where
 
 import Data.Maybe
 
+
 type Position = (Int, Int)
 
 data Field = O | X deriving (Eq, Show)
@@ -25,8 +26,3 @@ emptyCol = Col (replicate 19 Nothing)
 emptyBoard :: Board
 emptyBoard = Board (replicate 19 $ emptyCol)
 
-modifyColAtPos :: Col -> Position -> Field -> Col
-modifyColAtPos (Col fields) y f = emptyCol
-
-putOnBoard :: Board -> Position -> Field -> Board
-putOnBoard (Board cols) (x, y) f = emptyBoard

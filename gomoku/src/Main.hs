@@ -1,4 +1,6 @@
 module Main where
 
+import World
+
 main :: IO ()
-main = putStrLn "Hello, Haskell!"
+main = putStrLn "Hello"
