@@ -37,4 +37,4 @@ putOnBoard :: Board -> Position -> Player -> Board
 putOnBoard (Board rows) (x, y) f = Board $ (element x .~ putInRow (rows !! x) y f) rows
 
 getField :: Board -> Position -> Maybe Player
-getField board (x, y) = (((board^.rows)!!x)^.columns)!!y
+getField board (x, y) = (((board^.rows) !! x)^.columns) !! y

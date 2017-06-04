@@ -20,17 +20,17 @@ loop currentWorld@(World board currentPlayer) = do
 
     move <- getMove currentWorld
 
-    unless (2 < 1) (loop $ registerMove currentWorld (normalisePosition move))
+    unless (2 < 1) (loop $ registerMove currentWorld move)
 
 getMove :: World -> IO (Int, Int)
 getMove currentWorld@(World board _) = do
     putStrLn "Gimme ur mv"
     x <- getCoord
     y <- getCoord
-    let move = (x, y)
-    case getField board (normalisePosition (x, y)) of
+    let move = (normalisePosition (x, y))
+    case getField board move of
         Just a -> putStrLn "Bad, alrdy teken, wr8 agen" >> getMove currentWorld
-        Nothing -> return (x, y)
+        Nothing -> return move
 
 getCoord :: IO Int
 getCoord = do
