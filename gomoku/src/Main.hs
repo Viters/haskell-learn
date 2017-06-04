@@ -29,4 +29,4 @@ getCoord = do
     line <- getLine
     case readMaybe line of 
         Just a -> return a
-        Nothing -> putStrLn "Bad input, wr8 again" >> getCoord
+        Nothing -> putStrLn "Bad, wr8 agen" >> getCoord
