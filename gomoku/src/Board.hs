@@ -1,3 +1,5 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Board where
 
 import Data.Maybe
@@ -7,7 +9,9 @@ type Position = (Int, Int)
 
 data Player = O | X deriving (Eq, Show)
 data Row = Row { _columns :: [Maybe Player] }
+makeLenses ''Row
 data Board = Board { _rows :: [Row] }
+makeLenses ''Board
 
 showPosition :: Maybe Player -> String
 showPosition a = case a of
@@ -31,3 +35,6 @@ putInRow (Row fields) y f = Row $ (element y .~ Just f) fields
 
 putOnBoard :: Board -> Position -> Player -> Board
 putOnBoard (Board rows) (x, y) f = Board $ (element x .~ putInRow (rows !! x) y f) rows
+
+getField :: Board -> Position -> Maybe Player
+getField board (x, y) = (((board^.rows) !! x)^.columns) !! y
