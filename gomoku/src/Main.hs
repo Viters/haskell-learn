@@ -2,24 +2,36 @@ module Main where
 
 import World
 import Board
+import AI
 import Control.Monad
 import Text.Read
 
 go :: IO ()
-go = main 
+go = main
 
 main :: IO ()
 main = do
+    displayInfo
+
+    putStrLn "Play 1 player or 2 player? (inb4 1 or 2)"
+    variant <- getInt
+
+    case variant of
+        2 -> twoPlayerLoop braveNewWorld
+        1 -> onePlayerLoop braveNewWorld
+
+displayInfo :: IO ()
+displayInfo = do
     putStrLn "\n----- Lemme explein game -----"
     putStrLn "U wr8 coords and i put ur mark on da board"
     putStrLn "U win after u strike 5 star (but no mor) in da row (or diagonal)"
     putStrLn "Ur mv is evaluated liek this: giv row num (>= 1), next giv col num (>= 1)"
     putStrLn "If u giv move out of map u gonna pass turn"
     putStrLn "----- Hev fun -----\n"
-    loop braveNewWorld
 
-loop :: World -> IO ()
-loop currentWorld@(World board currentPlayer) = do
+twoPlayerLoop :: World -> IO ()
+twoPlayerLoop currentWorld@(World board currentPlayer) = do
+    putStrLn ""
     putStrLn $ show board
     putStr "----- Its turn for "
     putStr $ show currentPlayer
@@ -30,35 +42,59 @@ loop currentWorld@(World board currentPlayer) = do
     let newWorld = registerMove currentWorld move
     let end = gameEnded (_board newWorld) move
 
-    unless (end) (loop newWorld)
+    unless (end) (twoPlayerLoop newWorld)
     when (end) (finish newWorld)
 
+onePlayerLoop :: World -> IO ()
+onePlayerLoop currentWorld@(World board currentPlayer) = do
+    case currentPlayer of
+        X -> do
+            putStrLn ""
+            putStrLn $ show board
+            move <- getMove board
+
+            let newWorld = registerMove currentWorld move
+            let end = gameEnded (_board newWorld) move
+
+            unless (end) (onePlayerLoop newWorld)
+            when (end) (finish newWorld)
+
+        O -> do
+            let move = makeDecision board
+
+            let newWorld = registerMove currentWorld move
+            let end = gameEnded (_board newWorld) move
+
+            unless (end) (onePlayerLoop newWorld)
+            when (end) (finish newWorld)
 
 finish :: World -> IO ()
 finish currentWorld@(World board currentPlayer) = do
+    putStrLn ""
     putStrLn $ show board
 
-    putStrLn "Is end"
+    putStrLn "----- Is end -----"
     putStr "Gz to "
     putStrLn $ show $ nextPlayer currentPlayer
     putStrLn "Bye"
+    putStrLn ""
 
 getMove :: Board -> IO (Int, Int)
 getMove board = do
     putStrLn "Gimme ur mv"
-    x <- getCoord
-    y <- getCoord
+    x <- getInt
+    y <- getInt
     let move = normalisePosition (x, y)
     case getField board move of
         Just a -> putStrLn "Bad, alrdy teken, wr8 agen" >> getMove board
         Nothing -> return move
 
-getCoord :: IO Int
-getCoord = do
+getInt :: IO Int
+getInt = do
     line <- getLine
     case readMaybe line of 
         Just a -> return a
-        Nothing -> putStrLn "Bad, wr8 agen" >> getCoord
+        Nothing -> putStrLn "Bad, wr8 agen" >> getInt
 
 normalisePosition :: Position -> Position
 normalisePosition (x, y) = (x - 1, y - 1)
