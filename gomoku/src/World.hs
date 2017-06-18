@@ -15,16 +15,16 @@ nextPlayer a = case a of
 registerMove :: World -> Position -> World
 registerMove (World board cp) pos = World (putOnBoard board pos cp) (nextPlayer cp)
 
-gameEnded :: World -> Position -> Bool
-gameEnded world lastMove = 
-    or $ map (\x -> isWinningCombination world lastMove x) [fiveInRow, fiveInCol, fiveInDiagLeftRight, fiveInDiagRightLeft]
+gameEnded :: Board -> Position -> Bool
+gameEnded board lastMove = 
+    or $ map (\x -> isWinningCombination board lastMove x) [fiveInRow, fiveInCol, fiveInDiagLeftRight, fiveInDiagRightLeft]
 
-isWinningCombination :: World -> Position -> (Position -> Int -> [Position]) -> Bool
-isWinningCombination (World board _) lastMove f = 
-    exactlyOneTrue $ map (\x -> allTheSame $ positionsToFields board x) $ zipWith (\x y -> x lastMove y) (take 7 $ repeat f) [-3 .. 3]
+isWinningCombination :: Board -> Position -> (Position -> Int -> [Position]) -> Bool
+isWinningCombination board lastMove f = 
+    exactlyOneTrue $ map (\x -> allTheSame $ positionsToFields board x) (zipWith (\x y -> x lastMove y) (replicate 7 f) [-3 .. 3])
 
 fiveInRow :: Position -> Int -> [Position]
-fiveInRow (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] $ repeat b
+fiveInRow (a, b) offset = zip (repeat a) [(b - 2 + offset) .. (b + 2 + offset)]
 
 fiveInCol :: Position -> Int -> [Position]
 fiveInCol (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] $ repeat b
@@ -46,4 +46,3 @@ exactlyOneTrue l = count True l == 1
 
 count :: Eq a => a -> [a] -> Int
 count needle haystack = length (filter (==needle) haystack)
-

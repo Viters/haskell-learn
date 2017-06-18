@@ -43,5 +43,5 @@ getField board pos@(x, y)
 
 isPositionValid :: Position -> Bool
 isPositionValid (a, b)
-    | a >= 1 && a <= 19 && b >= 1 && b <= 19 = True
+    | a >= 0 && a <= 18 && b >= 0 && b <= 18 = True
     | otherwise = False
