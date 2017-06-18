@@ -15,23 +15,35 @@ nextPlayer a = case a of
 registerMove :: World -> Position -> World
 registerMove (World board cp) pos = World (putOnBoard board pos cp) (nextPlayer cp)
 
--- gameEnded :: Board -> Boolean
--- gameEnded = 
+gameEnded :: World -> Position -> Bool
+gameEnded world lastMove = 
+    or $ map (\x -> isWinningCombination world lastMove x) [fiveInRow, fiveInCol, fiveInDiagLeftRight, fiveInDiagRightLeft]
 
-fiveInRow :: Position -> [Position]
-fiveInRow (a, b) = zip [a-2 .. a+2] $ repeat b
+isWinningCombination :: World -> Position -> (Position -> Int -> [Position]) -> Bool
+isWinningCombination (World board _) lastMove f = 
+    exactlyOneTrue $ map (\x -> allTheSame $ positionsToFields board x) $ zipWith (\x y -> x lastMove y) (take 7 $ repeat f) [-3 .. 3]
 
-fiveInCol :: Position -> [Position]
-fiveInCol (a, b) = zip [a-2 .. a+2] $ repeat b
+fiveInRow :: Position -> Int -> [Position]
+fiveInRow (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] $ repeat b
 
-fiveInDiagLeftRight :: Position -> [Position]
-fiveInDiagLeftRight (a, b) = zip [a-2 .. a+2] [b-2 .. b+2]
+fiveInCol :: Position -> Int -> [Position]
+fiveInCol (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] $ repeat b
 
-fiveInDiagRightLeft :: Position -> [Position]
-fiveInDiagRightLeft (a, b) = zip [a-2 .. a+2] [b+2 .. b-2]
+fiveInDiagLeftRight :: Position -> Int -> [Position]
+fiveInDiagLeftRight (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] [(b - 2 + offset) .. (b + 2 + offset)]
+
+fiveInDiagRightLeft :: Position -> Int -> [Position]
+fiveInDiagRightLeft (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] (reverse [(b - 2 - offset) .. (b + 2 - offset)])
 
 positionsToFields :: Board -> [Position] -> [Maybe Player]
 positionsToFields board = map $ getField board
 
-allTheSame :: (Eq a) => [a] -> Bool
-allTheSame xs = and $ map (== head xs) (tail xs)
+allTheSame :: [Maybe Player] -> Bool
+allTheSame xs = (head xs /= Nothing) && (and $ map (== head xs) (tail xs))
+
+exactlyOneTrue :: [Bool] -> Bool
+exactlyOneTrue l = count True l == 1 
+
+count :: Eq a => a -> [a] -> Int
+count needle haystack = length (filter (==needle) haystack)
+

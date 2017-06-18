@@ -37,4 +37,11 @@ putOnBoard :: Board -> Position -> Player -> Board
 putOnBoard (Board rows) (x, y) f = Board $ (element x .~ putInRow (rows !! x) y f) rows
 
 getField :: Board -> Position -> Maybe Player
-getField board (x, y) = (((board^.rows) !! x)^.columns) !! y
+getField board pos@(x, y)
+    | isPositionValid pos = (((board^.rows) !! x)^.columns) !! y
+    | otherwise = Nothing
+
+isPositionValid :: Position -> Bool
+isPositionValid (a, b)
+    | a >= 1 && a <= 19 && b >= 1 && b <= 19 = True
+    | otherwise = False
