@@ -59,7 +59,7 @@ onePlayerLoop currentWorld@(World board currentPlayer) = do
             when (end) (finish newWorld)
 
         O -> do
-            move <- makeDecision board
+            let move = getBestPosition board
 
             let newWorld = registerMove currentWorld move
             let end = gameEnded (_board newWorld) move

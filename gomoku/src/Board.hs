@@ -38,7 +38,7 @@ getField board Invalid = Nothing
 
 position :: (Int, Int) -> Position
 position (x, y)
-    | x >= 0 && x <= 3 && y >= 0 && y <= 3 = Valid (x, y)
+    | x >= 0 && x <= 18 && y >= 0 && y <= 18 = Valid (x, y)
     | otherwise = Invalid
 
 movePosition :: Position -> (Int, Int) -> Position
