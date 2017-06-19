@@ -6,4 +6,4 @@ import Board
 data GameTree = GameTree World Position [GameTree] | Empty
 
 makeDecision :: Board -> Position
-makeDecision board = (1, 1)
+makeDecision board = position (1, 1)

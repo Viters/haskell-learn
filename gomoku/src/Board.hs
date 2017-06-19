@@ -5,8 +5,7 @@ module Board where
 import Data.Maybe
 import Control.Lens
 
-type Position = (Int, Int)
-
+data Position = Valid (Int, Int) | Invalid deriving (Eq, Show)
 data Player = O | X deriving (Eq, Show)
 data Row = Row { _columns :: [Maybe Player] }
 makeLenses ''Row
@@ -24,24 +23,24 @@ instance Show Row where
 instance Show Board where
     show (Board a) = foldl (\x y -> x ++ show y ++ "\n") "" a
 
-emptyRow :: Row
-emptyRow = Row (replicate 19 Nothing)
-
 emptyBoard :: Board
-emptyBoard = Board (replicate 19 $ emptyRow)
+emptyBoard = Board (replicate 19 $ Row (replicate 19 Nothing))
 
 putInRow :: Row -> Int -> Player -> Row
 putInRow (Row fields) y f = Row $ (element y .~ Just f) fields
 
 putOnBoard :: Board -> Position -> Player -> Board
-putOnBoard (Board rows) (x, y) f = Board $ (element x .~ putInRow (rows !! x) y f) rows
+putOnBoard (Board rows) (Valid (x, y)) f = Board $ (element x .~ putInRow (rows !! x) y f) rows
 
 getField :: Board -> Position -> Maybe Player
-getField board pos@(x, y)
-    | isPositionValid pos = (((board^.rows) !! x)^.columns) !! y
-    | otherwise = Nothing
+getField board (Valid (x, y)) = (((board^.rows) !! x)^.columns) !! y
+getField board Invalid = Nothing
 
-isPositionValid :: Position -> Bool
-isPositionValid (a, b)
-    | a >= 0 && a <= 18 && b >= 0 && b <= 18 = True
-    | otherwise = False
+position :: (Int, Int) -> Position
+position (a, b)
+    | a >= 0 && a <= 18 && b >= 0 && b <= 18 = Valid (a, b)
+    | otherwise = Invalid
+
+isValidPos :: Position -> Bool
+isValidPos (Valid _) = True
+isValidPos Invalid = False

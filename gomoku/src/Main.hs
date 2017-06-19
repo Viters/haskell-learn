@@ -26,7 +26,6 @@ displayInfo = do
     putStrLn "U wr8 coords and i put ur mark on da board"
     putStrLn "U win after u strike 5 star (but no mor) in da row (or diagonal)"
     putStrLn "Ur mv is evaluated liek this: giv row num (>= 1), next giv col num (>= 1)"
-    putStrLn "If u giv move out of map u gonna pass turn"
     putStrLn "----- Hev fun -----\n"
 
 twoPlayerLoop :: World -> IO ()
@@ -79,15 +78,19 @@ finish currentWorld@(World board currentPlayer) = do
     putStrLn "Bye"
     putStrLn ""
 
-getMove :: Board -> IO (Int, Int)
+getMove :: Board -> IO Position
 getMove board = do
     putStrLn "Gimme ur mv"
     x <- getInt
     y <- getInt
     let move = normalisePosition (x, y)
-    case getField board move of
-        Just a -> putStrLn "Bad, alrdy teken, wr8 agen" >> getMove board
-        Nothing -> return move
+    case move of 
+        Valid _ -> do
+            case getField board move of
+                Just _ -> putStrLn "Bad, alrdy teken, wr8 agen" >> getMove board
+                Nothing -> return move
+        Invalid -> putStrLn "Bad, outside, wr8 agen" >> getMove board
+    
 
 getInt :: IO Int
 getInt = do
@@ -96,5 +99,5 @@ getInt = do
         Just a -> return a
         Nothing -> putStrLn "Bad, wr8 agen" >> getInt
 
-normalisePosition :: Position -> Position
-normalisePosition (x, y) = (x - 1, y - 1)
+normalisePosition :: (Int, Int) -> Position
+normalisePosition (x, y) = position (x - 1, y - 1)

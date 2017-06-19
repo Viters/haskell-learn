@@ -17,23 +17,32 @@ registerMove (World board cp) pos = World (putOnBoard board pos cp) (nextPlayer 
 
 gameEnded :: Board -> Position -> Bool
 gameEnded board lastMove = 
-    or $ map (\x -> isWinningCombination board lastMove x) [fiveInRow, fiveInCol, fiveInDiagLeftRight, fiveInDiagRightLeft]
+    or $ map (\x -> isWinningCombination board lastMove x) [inRow, inCol, inDiagRL, inDiagLR]
 
 isWinningCombination :: Board -> Position -> (Position -> Int -> [Position]) -> Bool
 isWinningCombination board lastMove f = 
-    exactlyOneTrue $ map (\x -> allTheSame $ positionsToFields board x) (zipWith (\x y -> x lastMove y) (replicate 7 f) [-3 .. 3])
+    exactlyOneTrue $ map (\x -> allTheSame $ positionsToFields board x) (getPositionsCombinations lastMove f)
 
-fiveInRow :: Position -> Int -> [Position]
-fiveInRow (a, b) offset = zip (repeat a) [(b - 2 + offset) .. (b + 2 + offset)]
+getPositionsCombinations :: Position -> (Position -> Int -> [Position]) -> [[Position]]
+getPositionsCombinations lastMove f = filter (\x -> length x == 5) (zipWith (\x y -> x lastMove y) (replicate 7 f) [-3 .. 3])
 
-fiveInCol :: Position -> Int -> [Position]
-fiveInCol (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] $ repeat b
+validatePositions :: [(Int, Int)] -> [Position] 
+validatePositions xs = filter isValidPos $ map position xs
 
-fiveInDiagLeftRight :: Position -> Int -> [Position]
-fiveInDiagLeftRight (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] [(b - 2 + offset) .. (b + 2 + offset)]
+inRow :: Position -> Int -> [Position]
+inRow (Valid (a, b)) offset = validatePositions $ zip (repeat a) (fives b offset)
 
-fiveInDiagRightLeft :: Position -> Int -> [Position]
-fiveInDiagRightLeft (a, b) offset = zip [(a - 2 + offset) .. (a + 2 + offset)] (reverse [(b - 2 - offset) .. (b + 2 - offset)])
+inCol :: Position -> Int -> [Position]
+inCol (Valid (a, b)) offset = validatePositions $ zip (fives a offset) (repeat b)
+
+inDiagRL :: Position -> Int -> [Position]
+inDiagRL (Valid (a, b)) offset = validatePositions $ zip (fives a offset) (fives b offset)
+
+inDiagLR :: Position -> Int -> [Position]
+inDiagLR (Valid (a, b)) offset = validatePositions $ zip (fives a offset) (reverse $ fives b offset)
+
+fives :: Int -> Int -> [Int]
+fives mid offset = [(mid - 2 + offset) .. (mid + 2 + offset)]
 
 positionsToFields :: Board -> [Position] -> [Maybe Player]
 positionsToFields board = map $ getField board
@@ -42,7 +51,7 @@ allTheSame :: [Maybe Player] -> Bool
 allTheSame xs = (head xs /= Nothing) && (and $ map (== head xs) (tail xs))
 
 exactlyOneTrue :: [Bool] -> Bool
-exactlyOneTrue l = count True l == 1 
+exactlyOneTrue xs = count True xs == 1 
 
 count :: Eq a => a -> [a] -> Int
 count needle haystack = length (filter (==needle) haystack)
