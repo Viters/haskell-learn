@@ -24,7 +24,7 @@ isWinningCombination board lastMove f =
     exactlyOneTrue $ map (\x -> allTheSame $ positionsToFields board x) (getPositionsCombinations lastMove f)
 
 getPositionsCombinations :: Position -> (Position -> Int -> [Position]) -> [[Position]]
-getPositionsCombinations lastMove f = filter (\x -> length x == 5) (zipWith (\x y -> x lastMove y) (replicate 7 f) [-3 .. 3])
+getPositionsCombinations lastMove f = filter (\x -> length x == 5) (zipWith (\x y -> x lastMove y) (replicate 9 f) [-4 .. 4])
 
 validatePositions :: [(Int, Int)] -> [Position] 
 validatePositions xs = filter isValidPos $ map position xs
@@ -36,10 +36,10 @@ inCol :: Position -> Int -> [Position]
 inCol (Valid (a, b)) offset = validatePositions $ zip (fives a offset) (repeat b)
 
 inDiagRL :: Position -> Int -> [Position]
-inDiagRL (Valid (a, b)) offset = validatePositions $ zip (fives a offset) (fives b offset)
+inDiagRL (Valid (a, b)) offset = validatePositions $ zip (fives (a + offset) 0) (fives (b + offset) 0)
 
 inDiagLR :: Position -> Int -> [Position]
-inDiagLR (Valid (a, b)) offset = validatePositions $ zip (fives a offset) (reverse $ fives b offset)
+inDiagLR (Valid (a, b)) offset = validatePositions $ zip (fives (a - offset) 0) (reverse $ fives (b + offset) 0)
 
 fives :: Int -> Int -> [Int]
 fives mid offset = [(mid - 2 + offset) .. (mid + 2 + offset)]

@@ -6,8 +6,6 @@ import Data.List
 import Data.Maybe
 import Control.Lens
 
-data GameTree = GameTree World Position [GameTree] | Empty
-
 calcAtt :: Board -> Int -> Int -> Int -> Position -> (Int, Int) -> Bool -> Int
 calcAtt board n currVal currMet currPos move@(x, y) turnFlag
     | n < 5 && isValidPos (movePosition currPos move) == False && turnFlag == False =
