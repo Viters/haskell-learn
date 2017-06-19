@@ -37,9 +37,12 @@ getField board (Valid (x, y)) = (((board^.rows) !! x)^.columns) !! y
 getField board Invalid = Nothing
 
 position :: (Int, Int) -> Position
-position (a, b)
-    | a >= 0 && a <= 18 && b >= 0 && b <= 18 = Valid (a, b)
+position (x, y)
+    | x >= 0 && x <= 3 && y >= 0 && y <= 3 = Valid (x, y)
     | otherwise = Invalid
+
+movePosition :: Position -> (Int, Int) -> Position
+movePosition (Valid (x0, y0)) (x, y) = position (x0 + x, y0 + y)
 
 isValidPos :: Position -> Bool
 isValidPos (Valid _) = True
